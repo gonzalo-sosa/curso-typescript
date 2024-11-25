@@ -525,3 +525,888 @@ class Teacher extends Person {
 ```
 
 ### Polymorphism
+
+Open Closed Principle
+
+```ts
+class Principal extends Person {
+  override get fullName() {
+    return "Principal" + super.fullName;
+  }
+}
+
+let arr: Person[] = [
+  new Student("1", "John", "Smith"),
+  new Teacher("Mosh", "Hamedani"),
+  new Principal("Mary", "Smith"),
+];
+
+arr.forEach((p) => console.log(p.fullName));
+```
+
+### Private vs Protected members
+
+Ambos no pueden ser accedidos por fuera de la clase.
+Los miembros privados no se heredan, los métodos protegidos si.
+
+```ts
+class Person {
+  constructor(public firstName: string, public lastName: string) {}
+
+  get fullName(): string {
+    return this.firstName + " " + this.lastName;
+  }
+
+  private walk() {
+    console.log("Walking");
+  }
+
+  protected run() {
+    console.log("Running");
+  }
+}
+
+class Teacher extends Person {
+  takTest() {
+    this.walk(); // <-- ERROR
+    this.running(); // <-- OK
+  }
+}
+```
+
+### Abstract Classes and Methods
+
+```ts
+class Shape {
+  constructor(public color: string) {}
+
+  render() {}
+}
+
+class Circle extends Shape {
+  constructor(public radius: number, color: string) {
+    super(color);
+  }
+
+  override render(): void {
+    console.log("Rendering a circle");
+  }
+}
+
+const shape = new Shape("red");
+shape.render(); // <-- No tiene sentido
+```
+
+```ts
+abstract class Shape {
+  constructor(public color: string) {}
+
+  abstract render(): void;
+}
+
+const shape = new Shape("red"); // <-- ERROR: no se puede instanciar de una clase abstracta
+
+class Circle extends Shape() {
+  constructor(public radius: number, color: string) {
+    super(color);
+  }
+
+  override render(): void {
+    console.log("Rendering a circle");
+  }
+}
+```
+
+### Interfaces
+
+Definen el comportamiento/implementación de un objeto.
+
+```ts
+abstract class Calendar {
+  constructor(public name: string) {}
+
+  abstract addEvent(): void;
+  abstract removeEvent(): void;
+}
+```
+
+```ts
+interface Calendar {
+  name: string;
+
+  addEvent(): void;
+  removeEvent(): void;
+}
+```
+
+```ts
+interface CloudCalendar extends Calendar {
+  sync(): void;
+}
+```
+
+```ts
+class GoogleCalendar implements Calendar {
+  constructor(public name: string) {}
+
+  addEvent(): void {
+    //
+  }
+
+  removeEvent(): void {
+    //
+  }
+}
+```
+
+## Generics
+
+### Generics Classes
+
+```ts
+class KeyValuePair<T> {
+  constructor(public key: T, public value: string) {}
+}
+
+const pair1 = new KeyValuePair<number>(10, "ten");
+const pair2 = new KeyValuePair<string>("10", "ten");
+```
+
+```ts
+class KeyValuePair<K, V> {
+  constructor(public key: K, public value: V) {}
+}
+
+const pair1 = new KeyValuePair(10, "ten"); // <number, string>
+const pair2 = new KeyValuePair("ten", 10); // <string, number>
+```
+
+### Generics Functions
+
+```ts
+function wrapInArray<T>(value: T) {
+  return [value];
+}
+
+let numbers1 = wrapInArray(1);
+let numbers2 = wrapInArray("a");
+```
+
+```ts
+class ArrayUtils {
+  static wrapInArray<T>(value: T) {
+    return [value];
+  }
+}
+```
+
+### Generic Interfaces
+
+```ts
+interface Result<T> {
+  data: T | null;
+  error: string | null;
+}
+
+function fetch<T>(url: string): Result<T> {
+  return { data: null, error: null };
+}
+
+interface User {
+  username: string;
+}
+interface Product {
+  title: string;
+}
+
+let result1 = fetch<User>("api/user");
+
+console.log(result1.data?.username);
+
+let result2 = fetch<Product>("api/product");
+
+console.log(result2.data?.title);
+```
+
+### Generic Constraints
+
+```ts
+function echo<T>(value: T): T {
+  return value;
+}
+```
+
+```ts
+function echo<T extends number | string>(value: T): T {
+  return value;
+}
+
+echo("1"); // <-- OK
+echo(1); // <-- OK
+echo(true); // <-- ERROR
+```
+
+```ts
+function echo<T extends Person>(value: T): T {
+  return value;
+}
+
+echo(new Student(1, "Marcos", "Cash"));
+echo(new Principal("John", "Smith"));
+```
+
+### Extending Generic Classes
+
+```ts
+interface Product {
+  name: string;
+  price: number;
+}
+
+class Store<T> {
+  protected _objects: T[] = [];
+
+  add(obj: T): void {
+    this._objects.push(obj);
+  }
+}
+```
+
+```ts
+// Se pasa el parámetro genérico T
+class CompressibleStore<T> extends Store<T> {
+  compress() {}
+}
+
+let store = new CompressibleStore<Product>();
+
+store.compress();
+
+// Restringiendo el tipo del parámetro genérico, indicando que debe de tener por lo menos el atributo name
+class SearchableStore<T extends { name: string }> extends Store<T> {
+  find(name: string): T | undefined {
+    return this._objects.find((obj) => obj.name === name);
+  }
+}
+```
+
+```ts
+// Tipo específico
+class ProductStore extends Store<Product> {
+  filterByMinPrice(minPrice: number): Product[] {
+    return this._objects.filter((obj) => obj.price >= minPrice);
+  }
+}
+```
+
+### Keyof Operator
+
+```ts
+class Store<T> {
+  protected _objects: T[] = [];
+
+  add(obj: T): void {
+    this._objects.push(obj);
+  }
+
+  // if T is Product
+  // then keyof T => 'name' | 'price'
+  find(property: keyof T, value: unknown): T | undefined {
+    return this._objects.find((obj) => obj[property] === value);
+  }
+}
+```
+
+### Type Mapping
+
+Las keys obtenidas con "keyof" se pueden iterar.
+
+```ts
+interface Product {
+  name: string;
+  price: number;
+}
+
+type ReadOnlyProduct = {
+  readonly [K in keyof Product]: Product[K];
+};
+```
+
+```ts
+type ReadOnly<T> = {
+  readonly [K in keyof T]: T[K];
+};
+
+let product: ReadOnly<Product> = {
+  name: "a",
+  price: 10,
+};
+
+product.name = "b"; // <-- ERROR
+```
+
+```ts
+type Optional<T> = {
+  [K in keyof T]?: T[K];
+};
+
+type Nullable<T> = {
+  [K in keyof T]: T[K] | null;
+};
+```
+
+Para ver más tipos que ya están construidos(utility types) en typescript ver la [documentación](https://www.typescriptlang.org/docs/handbook/utility-types.html)
+
+## Decoradores
+
+Los decoradores son funciones que se ejecutan una única vez que es la creación de la clase que lo aplique. El decorador al ser una función, recibe por parámetro el constructor de la clase que lo utilice y puede agregar tanto atributos como métodos a través del uso del prototipo.
+
+### Class Decorators
+
+```ts
+function Component(constructor: Function) {
+  constructor.prototype.uniqueId = Date.now();
+  constructor.prototype.insertInDOM = () => {
+    console.log("Inserting the component in the DOM");
+  };
+}
+
+@Component
+class ProfileComponent {}
+```
+
+### Parameterized Decorators
+
+```ts
+type ComponentOptions = {
+  selector: string;
+};
+
+// Decorator factory
+function Component(options: ComponentOptions) {
+  return (constructor: Function) => {
+    constructor.prototype.options = options;
+  };
+}
+
+@Component({ selector: "#my-profile" })
+class ProfileComponent {}
+```
+
+### Decorator Composition
+
+Se aplican como la composición de funciones, primero se aplica de adentro hacia afuera. Ejemplos: f(g(x)).
+
+```ts
+@Component // Segunda llamada
+@Pipe // Primera llamada
+class ProfileComponent {}
+```
+
+### Method Decorators
+
+```ts
+function Log(target: any, methodName: string, descriptor: PropertyDescriptor) {
+  const original = descriptor.value as Function;
+  // Sólo puede realizarse con function ya que las arrow functions reescriben this
+  descriptor.value = function (...args: any) {
+    console.log("Before");
+    original.call(this, ...args);
+    console.log("After");
+  };
+}
+
+class Person {
+  @Log
+  say(message: string) {
+    console.log("Person says " + message);
+  }
+}
+```
+
+### Accessor Decorators
+
+```ts
+function Capitalize(
+  target: any,
+  methodName: string,
+  descriptor: PropertyDescriptor
+) {
+  const original = descriptor.get;
+
+  descriptor.get = function () {
+    const result = original?.call(this);
+
+    return typeof result === "string" ? result.toUpperCase() : result;
+  };
+}
+
+class Person {
+  constructor(public firstName: string, public lastName: string) {}
+
+  @Capitalize
+  get fullName() {
+    return this.firstName + " " + this.lastName;
+  }
+}
+```
+
+### Property Decorators
+
+```ts
+function MinLength(length: number) {
+  return (target: any, propertyName: string) => {
+    let value: string;
+
+    const descriptor: PropertyDescriptor = {
+      get() {
+        return value;
+      },
+      set(newValue: string) {
+        if (newValue.length < length)
+          throw new Error(
+            `${propertyName} should have at least have ${length} characters.`
+          );
+        value = newValue;
+      },
+    };
+
+    Object.defineProperty(target, propertyName, descriptor);
+  };
+}
+
+class User {
+  @MinLength(4)
+  password: string;
+
+  constructor(password: string) {
+    this.password = password;
+  }
+}
+```
+
+```ts
+let user1 = new User("1234"); // <-- OK
+let user2 = new User("123"); // <-- ERROR
+
+user1.password = "1"; // <-- ERROR
+```
+
+### Parameter Decorators
+
+```ts
+type WatchedParameter = {
+  methodName: string;
+  parameterIndex: number;
+};
+
+const watchedParameters: WatchedParameter[] = [];
+
+function Watch(target: any, methodName: string, parameterIndex: number) {
+  watchedParameters.push({
+    methodName,
+    parameterIndex,
+  });
+}
+
+class Vehicle {
+  move(@Watch speed: number) {}
+}
+```
+
+## Modules
+
+### Exporting and Importing
+
+```ts
+// shapes.ts
+export class Circle {}
+
+export class Square {}
+```
+
+```ts
+// main.ts
+import { Circle, Square } from "./shapes";
+```
+
+```ts
+// types.d.ts
+export interface Product {}
+```
+
+### Default Exports
+
+```ts
+// storage.ts
+export default class Store {}
+
+export enum Format {
+  Raw,
+  Compressed,
+}
+
+class Compressor {} // No existe fuera de este modulo
+class Encryptor {} // No existe fuera de este modulo
+```
+
+```ts
+// main.ts
+import Store. { Format } from "./storage";
+```
+
+### Wildcard Imports
+
+```ts
+// main.ts
+import * as Shapes from "./shapes";
+
+let circle = new Shapes.Circle(1);
+```
+
+### Re-exporting
+
+```ts
+// shapes/Circle.ts
+export default class Circle {}
+```
+
+```ts
+// shapes/Square.ts
+export default class Square {}
+```
+
+```ts
+// shapes/index.ts
+export Circle from "./Circle.ts";
+export Square from "./Square.ts";
+```
+
+```ts
+// main.ts
+import { Circle, Square } from "./shapes";
+```
+
+## Integration with JavaScript
+
+### Including JS Code in TS Projects
+
+Habilitar la opción "allowJs" en la configuración de typescript.
+Modificar el módulo a "commonJs"
+
+### Type Checking JS Code
+
+Habilitar opción "checkJs"
+
+```js
+// utils/fn.js
+export function calculateTax(income) {
+  return income * 0.3;
+}
+```
+
+```ts
+// main.ts
+import { calculateTax } from "./utils/fn";
+
+calculateTax(); // <-- ERROR: income tiene el tipo 'any' implícitamente
+```
+
+### Describing Types Using JSDoc
+
+```js
+/**
+ *
+ * @param {number} income
+ * @returns {number}
+ */
+export function calculateTax(income) {
+  return income * 0.3;
+}
+```
+
+```ts
+calculateTax(4); // <-- OK
+calculateTax(); // <-- ERROR: se esperaba un argumento del tipo number
+```
+
+### Creating Declaration Files
+
+Los archivos de definición de tipos tienen la nomenclatura "< type >.d.ts" por ejemplo "tax.d.ts"
+
+```ts
+// types/tax.d.ts
+export declare function calculareTax(income: number): number;
+```
+
+### Using Definitely Types Declaration Files
+
+Instalar la dependencia
+
+```bash
+npm i lodash
+```
+
+Instalar los tipos
+
+```bash
+npm i -D @types/lodash
+```
+
+## Creating a React app with TypeScript
+
+Luego de "vite@latest" va el nombre de la aplicación.
+
+```bash
+npm create vite@latest my-react-app --template react-ts
+```
+
+### Adding Bootstrap
+
+```bash
+npm i bootstrap
+```
+
+Importar el css del bootstrap en la entrada de la aplicación, es decir, en el archivo "main.tsx"
+
+```tsx
+import "bootstrap/dist/css/bootstrap.css";
+import "index.css";
+```
+
+### Creating a Component
+
+```ts
+// models/reminder.d.ts
+export default interface Reminder {
+  id: number;
+  title: string;
+}
+```
+
+```tsx
+// components/ReminderList.tsx
+import React from "react";
+import Reminder from "../models/reminder";
+
+interface ReminderListProps {
+  items: Reminder[];
+}
+
+function ReminderList({ items }: ReminderListProps) {
+  return (
+    <ul>
+      {items.map((item) => (
+        <li key={item.id}>{item.title}</li>
+      ))}
+    </ul>
+  );
+}
+
+export default ReminderList;
+```
+
+```tsx
+// App.tsx
+import "./App.css";
+import ReminderList from "./components/ReminderList";
+import Reminder from "./models/reminder";
+
+const reminders: Reminder[] = [{ id: 1, title: "Reminder 1" }];
+
+function App() {
+  return (
+    <>
+      <ReminderList items={reminders} />
+    </>
+  );
+}
+
+export default App;
+```
+
+### Using the State Hook
+
+Se utiliza "useState" para modificar el renderizado del componente cada vez que se modifiquen los reminder;
+
+### Calling the Backend
+
+Para simular el backend, se realiza la llamada a un api ["jsonplaceholder"](https://jsonplaceholder.typicode.com/) que devuelve un conjunto de datos de diferentes tipos.
+
+Se instala el paquete "axios"
+
+```bash
+npm i axios
+```
+
+Clase que realiza las peticiones a la api
+
+```ts
+import axios from "axios";
+import Reminder from "../models/reminder";
+
+const API_URL = "https://jsonplaceholder.typicode.com/";
+
+class ReminderService {
+  http = axios.create({
+    baseURL: API_URL,
+  });
+
+  async getReminders() {
+    const response = await this.http.get<Reminder[]>("/todos");
+    return response.data;
+  }
+
+  async addReminder(title: string) {
+    const response = await this.http.post<Reminder>("/todos", { title });
+    return response.data;
+  }
+
+  async removeReminder(id: number) {
+    const response = await this.http.delete("/todos/" + id);
+    return response.data;
+  }
+}
+
+// exporta una nueva instancia de la clase
+export default new ReminderService();
+```
+
+### Using the Effect Hook
+
+```tsx
+function App() {
+  const [reminders, setReminders] = useState<Reminder[]>([]);
+
+  useEffect(() => {
+    loadReminders();
+  }, []);
+
+  const loadReminders = async () => {
+    const reminders = await reminderService.getReminders();
+    setReminders(reminders);
+  };
+
+  return (
+    <div className="app">
+      <ReminderList items={reminders} />
+    </div>
+  );
+}
+
+export default App;
+```
+
+### Handling Events
+
+Para quitar elementos de la lista se le pasa una función al componente "ReminderList" que toma un id como parámetro y filtra de la lista actual para asignar la lista filtrada al estado. Para esto, se debe modificar el componente "ReminderList", agregando el método a recibir tanto en la interfaz como en la lista de parámetros y enviarle esta función al evento "onClick" del botón. Es importante crear una función flecha que ejecute la función onRemoveReminder dentro ya que sino se interpretará que se quiere enviar una función que reciba el evento como parámetro.
+
+```tsx
+const removeReminder = (id: number) => {
+  setReminders(reminders.filter((reminder) => reminder.id !== id));
+};
+
+return (
+  <div className="app">
+    <ReminderList items={reminders} onRemoveReminder={removeReminder} />
+  </div>
+);
+```
+
+```tsx
+import Reminder from "../models/reminder";
+
+interface ReminderListProps {
+  items: Reminder[];
+  onRemoveReminder: (id: number) => void;
+}
+
+function ReminderList({ items, onRemoveReminder }: ReminderListProps) {
+  return (
+    <ul className="list-group">
+      {items.map((item) => (
+        <li className="list-group-item" key={item.id}>
+          {item.title}
+          <button
+            onClick={() => {
+              onRemoveReminder(item.id);
+            }}
+            className="btn btn-outline-danger mx-2 rounded-pill"
+          >
+            Delete
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+export default ReminderList;
+```
+
+### Building a Form
+
+### Handling Form Submission
+
+## Node with TypeScript
+
+### Executing TypeScript Code With Node
+
+```bash
+npm i -D ts-node
+```
+
+### Setting Up an Express Project
+
+```bash
+npm i express
+```
+
+```bash
+npm i -D typescript @types/node @types/express
+```
+
+```bash
+npm i -D nodemon
+```
+
+### Creating a Basic Route
+
+```ts
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+```
+
+### Creating a Router
+
+```ts
+import { Router } from "express";
+
+const router = Router();
+
+router.get("/", (req, res) => {
+  res.send("List of Reminders");
+});
+
+export default router;
+```
+
+```ts
+import express from "express";
+import reminderRouter from "./routers/reminders";
+
+const app = express();
+
+app.use("/reminders", reminderRouter);
+
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
+app.listen(8000, () => console.log("Server started"));
+```
+
+### Parsing Request Bodies
+
+### Building an API
