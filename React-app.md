@@ -1,25 +1,33 @@
-# Creating a React app with TypeScript
+# Creando una Aplicación React con TypeScript
 
-Luego de "vite@latest" va el nombre de la aplicación.
+La integración de React con TypeScript permite aprovechar las ventajas de ambos, como la gestión de tipos estáticos y el rendimiento de React para construir interfaces de usuario robustas.
+
+Para iniciar un proyecto de React con TypeScript, utilizamos Vite, que es un bundler rápido y eficiente para aplicaciones modernas:
 
 ```bash
 npm create vite@latest my-react-app --template react-ts
 ```
 
-## Adding Bootstrap
+Esto crea una nueva aplicación de React con TypeScript preconfigurado.
+
+## Agregando Bootstrap
+
+Para agregar **Bootstrap** a la aplicación, se instala el paquete a través de npm:
 
 ```bash
 npm i bootstrap
 ```
 
-Importar el css del bootstrap en la entrada de la aplicación, es decir, en el archivo "main.tsx"
+Luego, se importa el archivo CSS de Bootstrap en el archivo de entrada de la aplicación (`main.tsx`):
 
 ```tsx
 import "bootstrap/dist/css/bootstrap.css";
 import "index.css";
 ```
 
-## Creating a Component
+## Creando un Componente
+
+Definimos una interfaz de tipo **Reminder** en TypeScript, que modela los datos que queremos manejar:
 
 ```ts
 // models/reminder.d.ts
@@ -29,9 +37,10 @@ export default interface Reminder {
 }
 ```
 
+Luego, se crea el componente **ReminderList** que recibe un array de objetos **Reminder** y los muestra en una lista:
+
 ```tsx
 // components/ReminderList.tsx
-import React from "react";
 import Reminder from "../models/reminder";
 
 interface ReminderListProps {
@@ -50,6 +59,8 @@ function ReminderList({ items }: ReminderListProps) {
 
 export default ReminderList;
 ```
+
+Finalmente, se agrega el componente **ReminderList** en `App.tsx`, pasándole un array de recordatorios:
 
 ```tsx
 // App.tsx
@@ -70,13 +81,17 @@ function App() {
 export default App;
 ```
 
-## Using the State Hook
+## Usando el Hook useState
 
-Se utiliza "useState" para modificar el renderizado del componente cada vez que se modifiquen los reminder;
+El hook `useState` permite mantener el estado de los datos y actualizar el renderizado de los componentes. En este caso, usamos `useState` para manejar los **reminders**:
 
-## Calling the Backend
+```tsx
+const [reminders, setReminders] = useState<Reminder[]>([]);
+```
 
-Para simular el backend, se realiza la llamada a un api ["jsonplaceholder"](https://jsonplaceholder.typicode.com/) que devuelve un conjunto de datos de diferentes tipos.
+## Llamadas al Backend
+
+Para simular el backend, se realiza la llamada a la API [JSONPlaceholder](https://jsonplaceholder.typicode.com/), un servicio que devuelve datos de prueba. **Axios** para realizar las solicitudes HTTP:
 
 Se instala el paquete "axios"
 
@@ -84,7 +99,7 @@ Se instala el paquete "axios"
 npm i axios
 ```
 
-Clase que realiza las peticiones a la api
+Clase **ReminderService** para gestionar las peticiones a la API:
 
 ```ts
 import axios from "axios";
@@ -117,7 +132,9 @@ class ReminderService {
 export default new ReminderService();
 ```
 
-## Using the Effect Hook
+## Usando el Hook useEffect
+
+El hook `useEffect` permite ejecutar efectos, como la obtención de la API, después del renderizado del componente. En este caso, `useEffect` para cargar los recordatorios desde la API cuando se monta el componente:
 
 ```tsx
 function App() {
@@ -125,7 +142,7 @@ function App() {
 
   useEffect(() => {
     loadReminders();
-  }, []);
+  }, []); // Se ejecuta solo una vez al montar el componente
 
   const loadReminders = async () => {
     const reminders = await reminderService.getReminders();
@@ -159,6 +176,8 @@ return (
 );
 ```
 
+Dentro del componente **ReminderList**, se añade un botón para eliminar el recordatorio:
+
 ```tsx
 // components/ReminderList.tsx
 import Reminder from "../models/reminder";
@@ -191,7 +210,9 @@ function ReminderList({ items, onRemoveReminder }: ReminderListProps) {
 export default ReminderList;
 ```
 
-## Building a Form
+## Construyendo el Formulario
+
+Se crea un formulario para agregar nuevos recordatorios. Se utiliza **useState** para manejar el valor del campo de entrada:
 
 ```tsx
 // components/NewReminder.tsx
@@ -224,7 +245,9 @@ function NewReminder({ onAddReminder }: NewReminderProps): JSX.Element {
 export default NewReminder;
 ```
 
-## Handling Form Submission
+## Manejo de Envíos de Formularios
+
+Se agrega un manejador para envío del formulario. Con el evento **onSubmit** se evitar que la página se recargue y se llama a la función que agrega el recordatorio:
 
 ```tsx
 // components/NewReminder.tsx
@@ -265,6 +288,8 @@ function NewReminder({ onAddReminder }: NewReminderProps): JSX.Element {
 export default NewReminder;
 ```
 
+Y en el componente **App**, se define una función para agregar el recordatorio a la lista mediante el uso del **reminderService**:
+
 ```tsx
 // App.tsx
 
@@ -275,8 +300,13 @@ const addReminder = async (title: string) => {
 
 return (
   <div className="app">
+    <!-- Se le pasa la función al componente -->
     <NewReminder onAddReminder={addReminder} />
     <ReminderList items={reminders} onRemoveReminder={removeReminder} />
   </div>
 );
 ```
+
+## Resumen
+
+Al integrar React con TypeScript, obtenemos los beneficios de un desarrollo más seguro y escalable. Usamos herramientas como useState, useEffect, y axios para manejar el estado, efectos secundarios, y la comunicación con APIs externas. Además, TypeScript asegura que los tipos de datos sean consistentes y ayuda a prevenir errores en tiempo de desarrollo.
