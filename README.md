@@ -1,12 +1,13 @@
 # Typescript
 
-Es un superset de javascript, es decir, que amplia las capacidades del lenguaje con tipos estáticos.
-Gracias al uso de typescript se pueden evitar problemas en el código que cuestan tiempo y dinero en solucionar. Su uso es perfecto para proyecto de media a gran escalar.
+Es un superset de JavaScript, es decir, que amplia las capacidades del lenguaje con tipos estáticos y otras características que ayudan a escribir código más seguro y escalable. A través de la inferencia de tipos y la posibilidad de especificar tipos explícitamente, TypeScript permite detectar errores en tiempo de compilación, mejorando la calidad del código y la productividad del desarrollador.
+Gracias al uso de typescript se pueden evitar problemas en el código que cuestan tiempo y dinero en solucionar. Su uso es perfecto para proyectos de media a gran escala.
 
 ## Lista de contenidos
 
 - [Fundamentos](./Fundamentos.md)
 - [OOP](./OOP.md)
-- [Modules e Integrar JavaScript con TypeScript](./Modules.md)
+- [Decoradores](./Decorators.md)
+- [Módulos e Integrar JavaScript con TypeScript](./Modules.md)
 - [React App](./React-app.md)
 - [Node y Express api](./Express-api.md)
