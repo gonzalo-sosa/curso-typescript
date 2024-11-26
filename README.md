@@ -5,7 +5,7 @@ Gracias al uso de typescript se pueden evitar problemas en el código que cuesta
 
 ## Lista de contenidos
 
-- [Fundamentos](./Fundamentos.md)
+- [Fundamentos](./Fundamentals.md)
 - [OOP](./OOP.md)
 - [Decoradores](./Decorators.md)
 - [Módulos e Integrar JavaScript con TypeScript](./Modules.md)
