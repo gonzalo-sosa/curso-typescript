@@ -181,3 +181,7 @@ class Vehicle {
 ```
 
 En este ejemplo, `@Watch` registra el índice del parámetro para realizar un seguimiento de su uso.
+
+## Resumen
+
+Los decoradores en TypeScript permiten una gran flexibilidad al trabajar con clases, métodos, propiedades y parámetros. A través de ellos, se puede añadir lógica adicional, modificar comportamientos y mejorar la reutilización del código. Sin embargo, los decoradores son una característica avanzada que se debe usar con cuidado para evitar complicar demasiado la lógica del programa.
