@@ -1,18 +1,18 @@
 # Conceptos básicos
 
-El compilar de typescript puede inferir o detectar el tipo de una variable sin necesidad de que la especifique
+El compilador de TypeScript es capaz de inferir el tipo de una variable en función de su valor inicial, lo que significa que no siempre es necesario declarar el tipo explícitamente:
 
 ```ts
 let x: number = 10;
 
-let y = 10; // number
+let y = 10; // Inferido como 'number'
 ```
 
 ## Tipos
 
-- any: la variable no tiene ningún tipo y puede ser reasignada sin problemas de tipos.
-- number: un número decimal, hexadecimal o flotante
-- string: valores encerrados en comillas simples o dobles
+- `any`: Una variable con tipo `any` puede contener cualquier valor y se puede reasignar sin restricciones de tipo.
+- `number`: Para números decimales, hexadecimales o flotantes.
+- `string`: Para cadenas de texto, ya sean comillas simples, dobles o backticks.
 
 ```ts
 let x: any = 0;
@@ -22,9 +22,9 @@ let y: number = 10;
 let z: string = "z";
 ```
 
-## Arrays
+## Arrays y Tuplas
 
-Los arrays sólo pueden ser de un tipo en específico
+Los arrays sólo pueden ser de un tipo en específico, es decir, que los elementos que contienen deben ser del mismo tipo.
 
 ```ts
 let arr1 = [1, 2, "3"]; // <-- ERROR
@@ -34,13 +34,16 @@ let arr2: number[] = [1, 2, 3];
 let arr3: string[] = ["1", "2", "3"];
 ```
 
+Las tuplas son definidas en forma de arrays pero traen consigo el problema de que al realizar `.push()` con un tipo de dato que no adecua al declarada este no dará error.
+
 ```ts
 let user: [number, string] = [1, "MMM"];
 ```
 
 ## Enums
 
-Se escriben en PascalCase
+Los enums permiten definir un conjunto de constantes con nombres legibles, que pueden ser numéricas o de tipo string.
+Se escriben en PascalCase.
 
 ```ts
 enum Size {
@@ -75,7 +78,7 @@ let mySize: Size = Size.Medium;
 
 ## Funciones
 
-Se les puede agregar la notación de tipos tanto a sus argumentos como al valor que retornan
+Se les puede agregar la notación de tipos tanto a sus argumentos como al valor que retornan.
 
 ```ts
 function calculateAverage(...args: number[]): number {
@@ -83,7 +86,7 @@ function calculateAverage(...args: number[]): number {
 }
 ```
 
-Los parámetros pueden ser opcionales con el signo de interrogación "?"
+Los parámetros pueden ser opcionales con el signo de interrogación `?`
 
 ```ts
 function calculateTax(income: number, taxYear?: number): number {
@@ -101,6 +104,8 @@ function calculateTax(income: number, taxYear = 2022): number {
 
 ## Objetos
 
+TypeScript permite definir objetos con tipos específicos para sus propiedades, incluyendo la posibilidad de hacerlas de solo lectura con `readonly`
+
 ```ts
 let employee: {
   id: number;
@@ -116,6 +121,8 @@ let employee: {
 
 employee.id = 2; // <-- ERROR
 ```
+
+Con propiedades `readonly`:
 
 ```ts
 let employee: {
@@ -133,9 +140,9 @@ let employee: {
 employee.retire(new Date());
 ```
 
-## Type Aliases
+## Alias de Tipos
 
-Definir tipos personalizados
+Se pueden crear alias para tipos complejos usando `type`, lo cual facilita la reutilización de tipos en distintas partes del código.
 
 ```ts
 type Employee = {
@@ -151,7 +158,9 @@ let employee: Employee = {
 };
 ```
 
-## Union Types
+## Tipos Combinados
+
+### Union Types
 
 Agregar más de un tipo a un argumento o variable
 
@@ -170,9 +179,9 @@ khToLbs(10);
 khToLbs("10kg");
 ```
 
-## Intersection Types
+### Intersection Types
 
-Combinar tipos
+Permiten combinar múltiples tipos en uno solo.
 
 ```ts
 type Draggable = {
@@ -193,7 +202,7 @@ let textBox: UIWidget = {
 
 ## Literal Types
 
-Limitar los valores que se le pueden asignar a una variable
+Permiten limitar los valores que se le pueden asignar a una variable.
 
 ```ts
 type Quantity = 50 | 100;
@@ -205,6 +214,8 @@ type Metric = "cm" | "inch";
 
 ## Nullable Types
 
+Es posible declarar variables que puedan ser nulas.
+
 ```ts
 function greet(name: string | null) {
   return name ? name.toUpperCase() : "Hola!";
@@ -214,6 +225,8 @@ greet(null); // <-- OK
 ```
 
 ## Optional Chaining
+
+El operador de encadenamiento opcional (`?.`) permite acceder a propiedades de objetos de forma segura, evitando errores si el objeto es `null` o `undefined`.
 
 ```ts
 type Customer = {
@@ -245,6 +258,8 @@ log?.("a");
 
 ## Nullish Coalescing Operator
 
+El operador `??` devuelve un valor predeterminado solo si la expresión es `null` o `undefined`.
+
 ```ts
 let speed: number | null = null;
 let ride = {
@@ -253,6 +268,8 @@ let ride = {
 ```
 
 ## Type Assertions
+
+Las aserciones de tipo permiten al desarrollador decirle al compilador que confíe en el tipo de una variable.
 
 ```ts
 let phone = document.getElementById("phone") as HTMLInputElement; // No es una conversión
@@ -266,9 +283,11 @@ let phone = <HTMLInputElement>document.getElementById("phone"); // No es una con
 phone.value;
 ```
 
-## Unknown type
+## Tipos Especiales
 
-Es preferible usar 'unknown' antes que 'any' ya que este tipo fuerza al compilar a realizar verificaciones al momento de compilar el código.
+### Unknown type
+
+Es preferible usar 'unknown' antes que 'any' ya que este tipo fuerza al compilador a realizar verificaciones al momento de compilar el código.
 
 ```ts
 function render(document: any) {
@@ -282,7 +301,9 @@ function render(document: unknown) {
 }
 ```
 
-## Never Type
+### Never Type
+
+Se utiliza cuando una función nunca retorna (por ejemplo, lanzando una excepción o entrando en un bucle infinito).
 
 ```ts
 function processEvents(): never {
