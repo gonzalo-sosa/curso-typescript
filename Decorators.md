@@ -45,7 +45,7 @@ En el ejemplo anterior, el decorador `@Component` recibe un objeto con opciones,
 
 ## Composición de Decoradores
 
-Se aplican como la composición de funciones, primero se aplica de adentro hacia afuera. Ejemplos: f(g(x)).
+Se aplican como la composición de funciones, primero se aplica de adentro hacia afuera. Ejemplo: f(g(x)).
 
 ```ts
 @Component // Segunda llamada
