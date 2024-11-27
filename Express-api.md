@@ -123,7 +123,7 @@ Al estructurar el proyecto se puede tener diferentes módulos de API. A continua
 2. routers/reminders.ts: Define las rutas para obtener y agregar recordatorios.
 3. server.ts: El archivo principal donde se configura el servidor.
 
-[Ejemplo](./reminders-api/)
+[Ejemplo](./apps/reminders-api/)
 
 Este es un ejemplo básico de cómo construir una API usando Express con TypeScript.
 

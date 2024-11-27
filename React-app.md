@@ -309,4 +309,6 @@ return (
 
 ## Resumen
 
+[Ejemplo](./apps/react-with-typescript/)
+
 Al integrar React con TypeScript, obtenemos los beneficios de un desarrollo más seguro y escalable. Usamos herramientas como useState, useEffect, y axios para manejar el estado, efectos secundarios, y la comunicación con APIs externas. Además, TypeScript asegura que los tipos de datos sean consistentes y ayuda a prevenir errores en tiempo de desarrollo.
